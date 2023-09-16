@@ -56,29 +56,12 @@ void print_vetor(int *v, int n) {
 
 int dividi(int a, int b) { return b ? (a % b) != 0 : 0; }
 
-int sequencia_equilibrada_max_min(int *v, int n) {
-  int min = INT_MAX;
-  int max = INT_MIN;
-
-  for (size_t i = 0; i < n; i++) {
-    if (v[i] < min) {
-      min = v[i];
-    }
-    if (v[i] > max) {
-      max = v[i];
-    }
-  }
-  return max % min == 0;
-}
-
 int sequencia_equilibrada(int *v, int n) {
   int equilibrada = 1; // assume verdadeiro
-  for (size_t i = 0; i < n; i++) {
-    for (size_t j = 0; j < n; j++) {
-      if (i != j && dividi(v[j], v[i]) && dividi(v[i], v[j])) {
-        equilibrada = 0;
-        break;
-      }
+  for (size_t i = 1; i < n; i++) {
+    if (dividi(v[i], v[i - 1]) && dividi(v[i - 1], v[i])) {
+      equilibrada = 0;
+      break;
     }
   }
   return equilibrada;
@@ -96,7 +79,7 @@ int main() {
 
   heap_sort(v, n);
 
-  int equilibrada = sequencia_equilibrada_max_min(v, n);
+  int equilibrada = sequencia_equilibrada(v, n);
   printf("%s\n", equilibrada ? "Sim" : "Nao");
 
   free(v);
