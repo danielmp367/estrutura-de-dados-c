@@ -22,7 +22,7 @@ static void heapify(int *v, size_t i, size_t size) {
     int temp = v[i];
     v[i] = v[largest];
     v[largest] = temp;
-    largest = i;
+    i = largest; // Error estava aqui já que eu fazia largest = i;
   }
 }
 
@@ -44,7 +44,7 @@ void heap_sort(int *v, size_t size) {
   }
 }
 
-static int string_to_seconds(const char *str) {
+int string_to_seconds(const char *str) {
   int hh, mm, ss;
 
   sscanf(str, "%d:%d:%d", &hh, &mm, &ss);
@@ -52,7 +52,7 @@ static int string_to_seconds(const char *str) {
   return (hh * 3600) + (mm * 60) + ss;
 }
 
-static void get(int *data1, int *data2) {
+void get(int *data1, int *data2) {
   char s1[9] = {'\0'};
   char s2[9] = {'\0'};
   scanf("%s %s", s1, s2);
@@ -70,15 +70,23 @@ int barbosinha_chair_count(int *entry, int *departure, size_t size) {
     if (entry[i] <= departure[j]) {
       count++;
       i++;
+      //      printf("Entrou no if i: %zu e j:%zu e count: %d\n", i, j, count);
     } else {
       j++;
       count--;
+      //      printf("Entrou no if i: %zu e j:%zu e count: %d\n", i, j, count);
     }
     if (maior < count) {
       maior = count;
     }
   }
   return maior;
+}
+
+void print(int *v1, int *v2, size_t size) {
+  for (size_t i = 0; i < size; i++) {
+    printf("%d\t%d\n", v1[i], v2[2]);
+  }
 }
 
 int main() {
@@ -98,6 +106,8 @@ int main() {
   int chairs = barbosinha_chair_count(entry, departure, n);
 
   printf("%d\n", chairs);
+
+  // print(entry, departure, n);
 
   free(entry);
   free(departure);
