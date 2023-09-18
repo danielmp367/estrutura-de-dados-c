@@ -9,14 +9,14 @@ typedef struct Autor {
   int indice_h;
 } Autor;
 
-void get(Autor *a) {
+static void get(Autor *a) {
   scanf("%s %d", a->nome, &a->publicacoes);
   a->citacoes = malloc(sizeof(int) * (a->publicacoes));
   for (size_t i = 0; i < a->publicacoes; i++) {
     scanf("%d", &a->citacoes[i]);
   }
 }
-int calcular_indice_h(Autor *a) {
+static int calcular_indice_h(Autor *a) {
   int indiceH = 0;
   for (int i = 0; i < a->publicacoes; i++) {
     if (a->citacoes[i] >= i + 1) {
@@ -27,7 +27,13 @@ int calcular_indice_h(Autor *a) {
   }
   return indiceH;
 }
-void delete(Autor *a) { free(a->citacoes); }
+void delete(Autor **v, size_t size) {
+  for (size_t i = 0; i < size; i++) {
+    free((*v)[i].citacoes);
+  }
+  free((*v));
+  *v = NULL;
+}
 
 typedef int (*fn_cmp)(const void *a, const void *b);
 
@@ -48,6 +54,18 @@ int compare_autor(Autor *a, Autor *b) {
   }
 }
 
+void insertion_sort(int *v, int n) {
+  int i, j, chosen;
+  for (i = 1; i < n; i++) {
+    chosen = v[i];
+
+    for (j = i - 1; (j >= 0) && (chosen > v[j]); j--) {
+      v[j + 1] = v[j];
+    }
+    v[j + 1] = chosen;
+  }
+}
+
 static void heapify(Autor *v, size_t i, size_t size) {
   size_t left, right, largest;
   while (i < size) {
@@ -59,7 +77,7 @@ static void heapify(Autor *v, size_t i, size_t size) {
       largest = left;
     }
 
-    if (right < size && compare_autor(&v[right], &v[largest])) {
+    if (right < size && compare_autor(&v[right], &v[largest]) > 0) {
 
       largest = right;
     }
@@ -90,7 +108,7 @@ int main() {
   Autor *vetor = malloc(sizeof(Autor) * n);
   for (size_t i = 0; i < n; i++) {
     get(&vetor[i]);
-
+    insertion_sort(vetor[i].citacoes, vetor[i].publicacoes);
     vetor[i].indice_h = calcular_indice_h(&vetor[i]);
   }
 
@@ -99,6 +117,8 @@ int main() {
   for (size_t i = 0; i < n; i++) {
     printf("%s %d\n", vetor[i].nome, vetor[i].indice_h);
   }
+
+  free(vetor);
 
   return 0;
 }
