@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef struct Autor {
   char nome[31];
@@ -15,27 +16,51 @@ void get(Autor *a) {
     scanf("%d", &a->citacoes[i]);
   }
 }
-
+int calcular_indice_h(Autor *a) {
+  int indiceH = 0;
+  for (int i = 0; i < a->publicacoes; i++) {
+    if (a->citacoes[i] >= i + 1) {
+      indiceH = i + 1;
+    } else {
+      break;
+    }
+  }
+  return indiceH;
+}
 void delete(Autor *a) { free(a->citacoes); }
 
-static void swap(int *v, int i, int j) {
-  int swp = v[i];
+typedef int (*fn_cmp)(const void *a, const void *b);
+
+static void swap(Autor *v, size_t i, size_t j) {
+  Autor tmp = v[i];
   v[i] = v[j];
-  v[j] = swp;
+  v[j] = tmp;
 }
 
-static void heapify(int *v, size_t i, size_t size) {
-  int left, right, largest;
+int compare_autor(Autor *a, Autor *b) {
+
+  if (a->indice_h > b->indice_h) {
+    return -1;
+  } else if (a->indice_h < b->indice_h) {
+    return 1;
+  } else {
+    return strcmp(a->nome, b->nome);
+  }
+}
+
+static void heapify(Autor *v, size_t i, size_t size) {
+  size_t left, right, largest;
   while (i < size) {
     left = (i * 2) + 1;
     right = (i * 2) + 2;
     largest = i;
 
-    if (left < size && v[left] > v[largest]) {
+    if (left < size && compare_autor(&v[left], &v[largest]) > 0) {
       largest = left;
     }
 
-    if (right < size && v[right] > v[largest]) {
+    if (right < size && compare_autor(&v[right], &v[largest])) {
+
       largest = right;
     }
 
@@ -48,17 +73,12 @@ static void heapify(int *v, size_t i, size_t size) {
   }
 }
 
-static void make_heap(int *v, size_t size) {
-  int i;
-  for (i = size / 2; i >= 0; i--) {
+void heap_sort(void *v, size_t size) {
+  for (int i = size / 2 - 1; i >= 0; i--) {
     heapify(v, i, size);
   }
-}
 
-void heap_sort(int *v, size_t size) {
-  int i;
-  make_heap(v, size);
-  for (i = size - 1; i > 0; i--) {
+  for (int i = size - 1; i > 0; i--) {
     swap(v, i, 0);
     heapify(v, 0, i);
   }
@@ -70,7 +90,14 @@ int main() {
   Autor *vetor = malloc(sizeof(Autor) * n);
   for (size_t i = 0; i < n; i++) {
     get(&vetor[i]);
-    heap_sort(vetor[i].citacoes, vetor[i].publicacoes);
+
+    vetor[i].indice_h = calcular_indice_h(&vetor[i]);
+  }
+
+  heap_sort(vetor, n);
+
+  for (size_t i = 0; i < n; i++) {
+    printf("%s %d\n", vetor[i].nome, vetor[i].indice_h);
   }
 
   return 0;
