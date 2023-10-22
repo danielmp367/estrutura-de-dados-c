@@ -79,19 +79,20 @@ int main() {
     enqueue(queue, process);
   }
 
-  int currentTime = 0;
+  int current_time = 0;
   while (queue->front != NULL) {
-    node_t *currentProcess = dequeue(queue);
-    if (currentProcess->p.time <= q) {
-      currentTime += currentProcess->p.time;
-      printf("%s %d %d ms\n", currentProcess->p.name, currentProcess->p.pid,
-             currentTime);
-      free(currentProcess);
+    node_t *current_process = dequeue(queue);
+    if (current_process->p.time <= q) {
+      current_time += current_process->p.time;
+      printf("%s %d %d ms\n", current_process->p.name, current_process->p.pid,
+             current_time);
     } else {
-      currentTime += q;
-      currentProcess->p.time -= q;
-      enqueue(queue, &currentProcess->p);
+      current_time += q;
+      current_process->p.time -= q;
+      enqueue(queue, &current_process->p);
     }
+    
+    free(current_process);
   }
 
   return 0;
