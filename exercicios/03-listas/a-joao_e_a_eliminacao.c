@@ -56,33 +56,33 @@ void list_remove_head(list_t *l) {
 }
 
 void list_remove(list_t *l, size_t i) {
-  if (list_empty(l) == 1) {
+  if (list_empty(l)) {
     return;
-  } else {
-    if (i == 0) {
-      list_remove_head(l);
-    } else {
-      node_t *prev = l->head;
-      node_t *curr = prev->next;
-      size_t count = 1;
+  }
+  if (i == 0) {
+    list_remove_head(l);
+    return;
+  }
 
-      while (curr != NULL && count < i) {
-        prev = curr;
-        curr = curr->next;
-        count++;
-      }
+  node_t *prev = l->head;
+  node_t *curr = prev->next;
+  size_t count = 1;
 
-      if (curr != NULL) {
-        prev->next = curr->next;
+  while (curr != NULL && count < i) {
+    prev = curr;
+    curr = curr->next;
+    count++;
+  }
 
-        if (curr == l->tail) {
-          l->tail = prev;
-        }
+  if (curr != NULL) {
+    prev->next = curr->next;
 
-        free(curr);
-        l->size--;
-      }
+    if (curr == l->tail) {
+      l->tail = prev;
     }
+
+    free(curr);
+    l->size--;
   }
 }
 
