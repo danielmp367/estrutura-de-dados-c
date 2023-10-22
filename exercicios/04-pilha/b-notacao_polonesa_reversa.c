@@ -1,72 +1,152 @@
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#define MAX_CHAR 105
+typedef struct {
+  char *items;
+  size_t size;
+  size_t capacity;
+} stack_t;
 
-// Função para verificar se um caractere é um operador
-int isOperator(char c) {
-  return (c == '+' || c == '-' || c == '*' || c == '/');
+void stack_initialize(stack_t **s) {
+  (*s) = malloc(sizeof(stack_t));
+  (*s)->capacity = 16;
+  (*s)->size = 0;
+  (*s)->items = malloc(sizeof(char) * (*s)->capacity);
 }
 
-// Função para determinar a precedência de um operador
-int precedence(char c) {
-  if (c == '+' || c == '-')
+int stack_empty(stack_t *s) { return (s->size == 0); }
+
+void stack_push(stack_t *s, char item) {
+  if (s->size == s->capacity) {
+    s->capacity *= 2;
+    s->items = realloc(s->items, sizeof(char) * s->capacity);
+  }
+
+  s->items[s->size++] = item;
+}
+
+void stack_pop(stack_t *s) {
+  if (s->size == s->capacity / 4 && s->capacity != 16) {
+    s->capacity /= 2;
+    s->items = realloc(s->items, sizeof(char) * s->capacity);
+  }
+
+  s->size--;
+}
+
+char stack_top(stack_t *s) {
+  if (stack_empty(s)) {
+    return '\0';
+  }
+  return s->items[s->size - 1];
+}
+
+void stack_delete(stack_t **s) {
+  free((*s)->items);
+  free(*s);
+  *s = NULL;
+}
+
+int get_precedence(char op) {
+  switch (op) {
+  case '+':
+  case '-':
     return 1;
-  if (c == '*' || c == '/')
+  case '*':
+  case '/':
     return 2;
+  case '^':
+    return 3;
+  }
   return 0;
 }
 
-// Função para converter a notação infixa para pós-fixa
-void infixToPostfix(char *infix, char *postfix) {
-  char stack[MAX_CHAR];
-  int top = -1;
-  int i, j = 0;
+char *space_remove(const char *src) {
+  long length_src = strlen(src);
+  char *out = malloc(sizeof(char) * length_src);
 
-  for (i = 0; infix[i]; i++) {
-    if (infix[i] == ' ') {
+  int i = 0;
+  int k = 0;
+
+  for (; i < length_src; i++) {
+    if (src[i] == '\0') {
+      break;
+    }
+    if (src[i] == ' ') {
       continue;
-    } else if (infix[i] >= '0' && infix[i] <= '9') {
-      while (infix[i] >= '0' && infix[i] <= '9') {
-        postfix[j++] = infix[i++];
+    }
+
+    out[k] = src[i];
+    k++;
+  }
+
+  out[strlen(out)] = '\0';
+
+  return out;
+}
+
+void infix_to_postfix(char *infix) {
+  stack_t *s;
+  stack_initialize(&s);
+
+  int length = strlen(infix);
+  char numberBuffer[20]; // Suponha que números inteiros terão até 20 dígitos
+
+  for (int i = 0; i < length; i++) {
+    char c = infix[i];
+    if (c == ' ') {
+      continue;
+    }
+
+    if (isdigit(c)) {
+      int j = 0;
+      while (i < length && isdigit(c)) {
+        numberBuffer[j++] = c;
+        i++;
+        c = infix[i];
       }
-      postfix[j++] = ' ';
-      i--;
-    } else if (isOperator(infix[i])) {
-      while (top >= 0 && precedence(stack[top]) >= precedence(infix[i])) {
-        postfix[j++] = stack[top--];
-        postfix[j++] = ' ';
+      numberBuffer[j] = '\0';
+      printf("%s ", numberBuffer);
+      i--; // Volte um passo para processar o próximo caractere
+    } else if (c == '(') {
+      stack_push(s, c);
+    } else if (c == ')') {
+      while (!stack_empty(s) && stack_top(s) != '(') {
+        printf("%c ", stack_top(s));
+        stack_pop(s);
       }
-      stack[++top] = infix[i];
-    } else if (infix[i] == '(') {
-      stack[++top] = infix[i];
-    } else if (infix[i] == ')') {
-      while (top >= 0 && stack[top] != '(') {
-        postfix[j++] = stack[top--];
-        postfix[j++] = ' ';
+      stack_pop(s);
+    } else {
+      while (!stack_empty(s) &&
+             get_precedence(stack_top(s)) >= get_precedence(c)) {
+        printf("%c ", stack_top(s));
+        stack_pop(s);
       }
-      top--; // Remove '(' from the stack
+      stack_push(s, c);
     }
   }
 
-  while (top >= 0) {
-    postfix[j++] = stack[top--];
-    postfix[j++] = ' ';
+  while (!stack_empty(s)) {
+    printf("%c ", stack_top(s));
+    stack_pop(s);
   }
-  postfix[j] = '\0';
+
+  // printf("\n");
+  stack_delete(&s);
 }
 
 int main() {
-  char infix[MAX_CHAR];
-  char postfix[MAX_CHAR];
+  const int max = 100000;
+  char *infix = malloc(sizeof(char) * max);
 
-  // Leitura da expressão infixa
-  fgets(infix, MAX_CHAR, stdin);
-  infix[strcspn(infix, "\n")] = '\0'; // Remove a quebra de linha
+  fgets(infix, max, stdin);
+  // char *out = space_remove(infix);
 
-  infixToPostfix(infix, postfix);
-  printf("%s\n", postfix);
+  // printf("%s\n", out);
+  infix_to_postfix(infix);
 
+  free(infix);
   return 0;
 }
