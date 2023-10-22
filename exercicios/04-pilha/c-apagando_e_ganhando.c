@@ -71,25 +71,28 @@ void remove_digits(char *seq, int n, int d) {
 
 
 int main() {
-
   char *buffer;
   int n = 0;
   int d = 0;
 
   while (1) {
     scanf("%d %d", &n, &d);
-    if(n == 0 || d == 0) {
+    if (n == 0 || d == 0) {
       break;
     }
-    buffer = malloc(sizeof(char) * n);
+    if (d >= n) {
+      //fprintf(stderr, "Erro: d deve ser menor que n.\n");
+      continue;
+    }
+    buffer = malloc(sizeof(char) * (n + 1));
+    if (buffer == NULL) {
+      //fprintf(stderr, "Erro de alocação de memória\n");
+      exit(1);
+    }
     scanf("%s", buffer);
-    // buf_clean();
     remove_digits(buffer, n, d);
-  
     free(buffer);
   }
-
- 
 
   return 0;
 }
