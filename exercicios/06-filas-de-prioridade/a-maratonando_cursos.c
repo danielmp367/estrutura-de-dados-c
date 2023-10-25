@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 typedef struct {
-  int conhecimento;
+  int conhecimento; 
   int semana;
 } curso_t;
 
@@ -14,7 +14,7 @@ typedef struct priority_queue_t {
   size_t capacity;
 } priority_queue_t;
 
-bool maior(curso_t *a, curso_t *b) {
+bool compare(curso_t *a, curso_t *b) {
   if (a->conhecimento > b->conhecimento) {
     return true;
   }
@@ -33,7 +33,7 @@ static bool priority_queue_empty(priority_queue_t *pq) {
 static void priority_queue_heapify_bottom_up(priority_queue_t *pq, size_t i) {
   size_t p;
   for (p = (i - 1) / 2; i != 0; i = p, p = (p - 1) / 2) {
-    if (maior(&pq->pqueue[p], &pq->pqueue[i])) {
+    if (compare(&pq->pqueue[p], &pq->pqueue[i])) {
       break;
     }
     curso_t aux = pq->pqueue[i];
@@ -49,10 +49,10 @@ static void priority_queue_heapify_top_down(priority_queue_t *pq, size_t i) {
     i = largest;
     l = 2 * i + 1;
     r = 2 * i + 2;
-    if (l < pq->size && maior(&pq->pqueue[l], &pq->pqueue[largest])) {
+    if (l < pq->size && compare(&pq->pqueue[l], &pq->pqueue[largest])) {
       largest = l;
     }
-    if (r < pq->size && maior(&pq->pqueue[r], &pq->pqueue[largest])) {
+    if (r < pq->size && compare(&pq->pqueue[r], &pq->pqueue[largest])) {
       largest = r;
     }
     if (largest == i) {
@@ -113,7 +113,6 @@ curso_t get_course() {
 
 int main() {
   int n, m;
-  int g, v;
 
   scanf("%d %d", &n, &m);
 
