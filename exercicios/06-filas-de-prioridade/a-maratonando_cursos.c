@@ -82,9 +82,9 @@ void priority_queue_push(priority_queue_t *pq, curso_t course) {
     pq->capacity *= 2;
     pq->pqueue = realloc(pq->pqueue, sizeof(curso_t) * pq->capacity);
   }
-  pq->pqueue[pq->size++] = course;
+  pq->pqueue[pq->size] = course;
   priority_queue_heapify_bottom_up(pq, pq->size);
-  //pq->size++;
+  pq->size++;
 }
 
 void priority_queue_pop(priority_queue_t *pq) {
@@ -118,22 +118,22 @@ int main() {
 
   priority_queue_t *pq;
   priority_queue_initialize(&pq);
-  int *semanas = malloc(m * sizeof(int));
+  unsigned char *semanas = malloc(m * sizeof(unsigned char));
 
   for (size_t i = 0; i < n; i++) {
     semanas[i] = 0;
-    curso_t c = get_course();
-    priority_queue_push(pq, c);
+    curso_t course = get_course();
+    priority_queue_push(pq, course);
   }
 
   int sum = 0;
 
   while (!priority_queue_empty(pq)) {
-    curso_t c = priority_queue_front(pq);
-    int indice = c.semana - 1;
+    curso_t course = priority_queue_front(pq);
+    indice = course.semana - 1;
     if (!semanas[indice]) {
       semanas[indice] = 1;
-      sum += c.conhecimento;
+      sum += course.conhecimento;
     }
     priority_queue_pop(pq);
   }
