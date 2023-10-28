@@ -118,12 +118,13 @@ int main() {
 
   priority_queue_t *pq;
   priority_queue_initialize(&pq);
-  unsigned char *semanas = malloc(m * sizeof(unsigned char));
+  unsigned char *semanas = calloc(m, sizeof(unsigned char));
 
   for (size_t i = 0; i < n; i++) {
-    semanas[i] = 0;
     curso_t course = get_course();
-    priority_queue_push(pq, course);
+    if (course.semana <= m) {
+      priority_queue_push(pq, course);
+    }
   }
 
   int sum = 0;
