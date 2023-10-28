@@ -6,7 +6,7 @@
 *.ko
 *.obj
 *.elf
-
+*.sublime*
 # Linker output
 *.ilk
 *.map
