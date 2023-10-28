@@ -37,6 +37,7 @@ void stack_pop(stack_t *s) {
   }
 }
 
+
 char stack_top(stack_t *s) { return s->items[s->length - 1]; }
 
 void stack_delete(stack_t **s) {
@@ -58,7 +59,9 @@ void remove_digits(char *seq, int n, int d) {
     }
     stack_push(s, c);
   }
-  s->length = n - d;
+  while(s->length > (n - d)) {
+    stack_pop(s);
+  }
 
   for (size_t i = 0; i < s->length; i++) {
     printf("%c", s->items[i]);
@@ -81,12 +84,10 @@ int main() {
       break;
     }
     if (d >= n) {
-      //fprintf(stderr, "Erro: d deve ser menor que n.\n");
       continue;
     }
     buffer = malloc(sizeof(char) * (n + 1));
     if (buffer == NULL) {
-      //fprintf(stderr, "Erro de alocação de memória\n");
       exit(1);
     }
     scanf("%s", buffer);
